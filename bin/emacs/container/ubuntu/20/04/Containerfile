@@ -1,0 +1,26 @@
+#syntax=docker/dockerfile:1.3-labs
+
+FROM ubuntu:20.04
+MAINTAINER gepr <gepr.nonrad@gmail.com>
+
+RUN <<DEPS
+export DEBIAN_FRONTEND=noninteractive
+apt update
+apt install -y \
+    build-essential libgtk-3-dev libgnutls28-dev libtiff5-dev libgif-dev \
+    libjpeg-dev libpng-dev libxpm-dev libncurses-dev texinfo \
+    libgccjit0 libgccjit-10-dev gcc-10 g++-10 libjansson4 libjansson-dev
+DEPS
+
+RUN git clone --branch emacs-29.1 --depth 1 git://git.savannah.gnu.org/emacs.git
+
+WORKDIR emacs/
+
+RUN <<BUILD
+export CC=/usr/bin/gcc-10 CXX=/usr/bin/gcc-10
+./autogen.sh
+./configure --with-native-compilation --with-json=ifavailable --with-pgtk
+make -j8
+BUILD
+
+TAG emacs:29-ubuntu
