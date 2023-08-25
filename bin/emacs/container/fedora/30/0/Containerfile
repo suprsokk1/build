@@ -1,0 +1,28 @@
+#syntax=docker/dockerfile:1.3-labs
+
+FROM fedora:38
+MAINTAINER gepr <gepr.nonrad@gmail.com>
+
+RUN <<DEPS
+dnf -y install git libgccjit libgccjit-devel
+DEPS
+
+
+RUN dnf -y install dnf-plugins-core
+# RUN dnf config --enableplugin=builddep --save
+# RUN dnf -y install dnf-command(builddep)
+# RUN dnf -y  python-dnf-plugins-core
+RUN dnf -y builddep emacs
+
+RUN git clone --branch emacs-29.1 --depth 1 git://git.savannah.gnu.org/emacs.git
+
+WORKDIR emacs/
+
+RUN <<BUILD
+# export CC=/usr/bin/gcc-10 CXX=/usr/bin/gcc-10
+./autogen.sh
+./configure --with-native-compilation --with-json --with-pgtk
+make -j8
+BUILD
+
+TAG "emacs:29.1-fedora"
