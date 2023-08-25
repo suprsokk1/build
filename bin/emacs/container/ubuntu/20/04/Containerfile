@@ -22,5 +22,3 @@ export CC=/usr/bin/gcc-10 CXX=/usr/bin/gcc-10
 ./configure --with-native-compilation --with-json=ifavailable --with-pgtk
 make -j8
 BUILD
-
-TAG emacs:29-ubuntu
